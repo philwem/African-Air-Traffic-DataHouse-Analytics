@@ -64,70 +64,209 @@ The result is a scalable analytics foundation capable of powering real-time maps
 
 ---
 
-## Data Engineering Challenges Solved
 
-### 1. High-Volume Streaming Data
+## 1. Project Purpose & Scope (README Content)
 
-* Continuous ingestion of ADS-B messages
-* Early filtering to discard irrelevant global data
+### Purpose
 
-### 2. Geospatial Processing
+The African Air Traffic DataHouse & Analytics Platform is a data engineering and analytics system designed to ingest, process, store, and analyze aircraft movement data across the African continent. The platform supports real-time and batch aviation data use cases including traffic monitoring, congestion analysis, airline performance, and regulatory reporting.
 
-* Bounding-box and polygon-based filtering
-* Country-level airspace attribution using spatial joins
+### Scope (MVP)
 
-### 3. Data Enrichment
+**Geographic Scope:** Entire African continent
 
-* Aircraft, airline, and registration enrichment via adsbdb
-* Integration of static airport reference data
+**MVP Capabilities:**
 
-### 4. Analytics Modeling
+* Ingest ADS-B flight position data
+* Ingest aircraft, airline, and airport metadata
+* Store raw and curated datasets in a multi-layer data lake
+* Transform data into analytics-ready models
+* Serve curated datasets via a data warehouse
+* Enable BI dashboards and geospatial analysis
 
-* Star schema optimized for time-series and geospatial queries
-* Pre-aggregated gold tables for dashboard performance
+### Out of Scope (Phase 1 MVP)
 
----
-
-## Core Analytics Use Cases
-
-* Flight density heatmaps over West Africa
-* Top airlines operating by country and airport
-* Hourly and daily air traffic trends
-* Route popularity and regional airspace utilization
+* Global (non-Africa) flight coverage
+* Predictive modeling and ML
+* Passenger-level data
 
 ---
 
-## Why This Project Stands Out
+## 2. Naming Conventions
 
-* Focuses on an **underrepresented geographic region**
-* Combines **streaming + batch data engineering**
-* Demonstrates **geospatial analytics at scale**
-* Uses **real aviation data and APIs**, not synthetic datasets
-* Designed with **production-style architecture and tooling**
+### 2.1 General Principles
 
----
-
-## Repository Roadmap
-
-This repository will include:
-
-* Ingestion scripts (batch and streaming)
-* Airflow DAGs
-* dbt transformation models
-* Data warehouse schemas (PostgreSQL / ClickHouse)
-* Analytics-ready SQL views
-* Interactive dashboards
-
-Each component is modular and documented to reflect real-world data engineering practices.
+* Use lowercase only
+* Use snake_case
+* Names must be descriptive and unambiguous
+* Avoid abbreviations unless industry-standard
 
 ---
 
-## Next Steps
+### 2.2 Repository Naming
 
-* Implement ingestion pipelines
-* Build Silver and Gold dbt models
-* Deploy geospatial dashboards
+**Format:**
+
+```
+air-traffic-datahouse
+```
 
 ---
 
-*This project is intended for portfolio, learning, and demonstration purposes and uses publicly available or sample aviation datasets.*
+### 2.3 Branch Naming
+
+| Type        | Pattern                     | Example                |
+| ----------- | --------------------------- | ---------------------- |
+| Main        | main                        | main                   |
+| Development | develop                     | develop                |
+| Feature     | feature/<short-description> | feature/adsb-ingestion |
+| Bugfix      | bugfix/<short-description>  | bugfix/schema-fix      |
+
+---
+
+### 2.4 Commit Messages
+
+**Format:**
+
+```
+<type>: <short description>
+```
+
+**Types:**
+
+* feat: new functionality
+* fix: bug fix
+* docs: documentation only
+* refactor: non-breaking code change
+* chore: tooling or housekeeping
+
+**Example:**
+
+```
+feat: add adsb json schema
+```
+
+---
+
+### 2.5 Data Layer Naming
+
+| Layer         | Prefix  |
+| ------------- | ------- |
+| Raw / Landing | raw_    |
+| Bronze        | bronze_ |
+| Silver        | silver_ |
+| Gold          | gold_   |
+
+**Example:**
+
+```
+silver_flight_positions
+```
+
+---
+
+### 2.6 Table Naming
+
+**Format:**
+
+```
+<layer>_<entity>[_<granularity>]
+```
+
+**Examples:**
+
+* bronze_adsb_messages
+* silver_flights_daily
+* gold_airport_congestion
+
+---
+
+### 2.7 Column Naming
+
+* snake_case
+* Units included when applicable
+
+**Examples:**
+
+* aircraft_icao
+* latitude_deg
+* altitude_ft
+* event_timestamp_utc
+
+---
+
+### 2.8 Pipeline & DAG Naming
+
+**Format:**
+
+```
+<layer>_<source>_<frequency>
+```
+
+**Examples:**
+
+* ingestion_adsb_streaming
+* silver_transform_daily
+
+---
+
+### 2.9 Environment Naming
+
+| Environment | Name    |
+| ----------- | ------- |
+| Development | dev     |
+| Staging     | staging |
+| Production  | prod    |
+
+---
+
+## 3. Repository Folder Structure
+
+### Authoritative Structure
+
+```
+air-traffic-datahouse/
+│── ingestion/              # Data ingestion services
+│   ├── adsb/
+│   ├── metadata/
+│
+│── lake/                   # Data lake layers
+│   ├── bronze/
+│   ├── silver/
+│
+│── transformations/        # dbt models
+│   ├── staging/
+│   ├── marts/
+│
+│── orchestration/          # Airflow DAGs
+│
+│── warehouse/              # DWH schemas & loaders
+│
+│── analytics/              # BI models & queries
+│
+│── infra/                  # IaC, deployment configs
+│
+│── docs/                   # Architecture & decisions
+│
+│── README.md
+│── NAMING_CONVENTIONS.md
+```
+
+---
+
+## 4. Governance Rules
+
+* No code is merged without following naming standards
+* All new datasets must declare layer and ownership
+* Breaking schema changes require documentation
+
+---
+
+## 5. Phase 0 Exit Checklist
+
+* Naming conventions documented
+* Repository initialized
+* Folder structure committed
+* README clearly explains purpose and scope
+
+**Phase 0 Status: COMPLETE**
