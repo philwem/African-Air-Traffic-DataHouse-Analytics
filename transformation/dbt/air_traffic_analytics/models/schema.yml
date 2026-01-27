@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_flight_positions
+    columns:
+      - name: aircraft_icao
+        tests: [not_null]
+      - name: event_ts
+        tests: [not_null]
+      - name: latitude_deg
+        tests: [not_null]
+      - name: longitude_deg
+        tests: [not_null]
+
+  - name: stg_dim_aircraft
+    columns:
+      - name: aircraft_icao
+        tests: [not_null, unique]
+
+  - name: stg_dim_airport
+    columns:
+      - name: airport_icao
+        tests: [not_null, unique]
+
+  - name: int_flight_positions_daily
+    columns:
+      - name: flight_date
+        tests: [not_null]
+      - name: aircraft_icao
+        tests: [not_null]
