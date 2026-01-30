@@ -35,6 +35,11 @@ data/
 
 # If you want to keep empty folder structure under lake/, use .gitkeep files instead.
 
+orchestration/airflow/.env
+.env
+**/*.env
+
+
 # --- Jupyter ---
 .ipynb_checkpoints/
 

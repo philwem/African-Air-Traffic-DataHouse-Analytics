@@ -23,3 +23,5 @@ where aircraft_icao is not null
   and event_timestamp_utc is not null
   and latitude_deg is not null
   and longitude_deg is not null
+
+

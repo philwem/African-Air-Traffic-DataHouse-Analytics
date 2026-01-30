@@ -12,28 +12,24 @@ def utc_now_for_filename() -> str:
 
 
 def main():
-    config_path = Path("ingestion/adsb/opensky_config.json")
+    # Always load config relative to THIS file (works in Windows + Docker)
+    config_path = Path(__file__).resolve().parent / "opensky_config.json"
     cfg = json.loads(config_path.read_text(encoding="utf-8"))
 
-    out_dir = Path(cfg["output_path"])
+    # Ensure output writes into the mounted project folder (/opt/project/...)
+    project_root = Path(__file__).resolve().parents[2]
+    out_dir = project_root / cfg["output_path"]
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    while True:
-        ts = utc_now_for_filename()
-        try:
-            r = requests.get(cfg["endpoint"], timeout=cfg["timeout_seconds"])
-            r.raise_for_status()
-            payload = r.json()
+    ts = utc_now_for_filename()
+    r = requests.get(cfg["endpoint"], timeout=cfg["timeout_seconds"])
+    r.raise_for_status()
+    payload = r.json()
 
-            out_file = out_dir / f"opensky_states_{ts}.json"
-            out_file.write_text(json.dumps(payload), encoding="utf-8")
+    out_file = out_dir / f"opensky_states_{ts}.json"
+    out_file.write_text(json.dumps(payload), encoding="utf-8")
 
-            print(f"[{ts}] wrote {out_file}")
-
-        except Exception as e:
-            print(f"[{ts}] ERROR: {e}")
-
-        time.sleep(cfg["poll_interval_seconds"])
+    print(f"[{ts}] wrote {out_file}")
 
 
 if __name__ == "__main__":

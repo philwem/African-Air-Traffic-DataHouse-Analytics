@@ -4,10 +4,23 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
+import os
 
 
-CONFIG_FILE = Path("ingestion/metadata/adsbdb_config.json")
-OUT_DIR = Path("lake/bronze/metadata/adsbdb/airlines")
+# Resolve paths relative to this file so script works locally, in Docker, Airflow, or CI.
+# Allow overrides via environment variables: ADSBDB_CONFIG_FILE, ADSBDB_OUT_DIR
+HERE = Path(__file__).resolve().parent               # ingestion/metadata
+PROJECT_ROOT = HERE.parents[2]                       # repository root (../..)
+
+CONFIG_FILE = Path(
+    os.environ.get("ADSBDB_CONFIG_FILE", str(HERE / "adsbdb_config.json"))
+).expanduser()
+OUT_DIR = Path(
+    os.environ.get(
+        "ADSBDB_OUT_DIR",
+        str(PROJECT_ROOT / "lake/bronze/metadata/adsbdb/airlines"),
+    )
+).expanduser()
 
 
 def utc_now_filename() -> str:

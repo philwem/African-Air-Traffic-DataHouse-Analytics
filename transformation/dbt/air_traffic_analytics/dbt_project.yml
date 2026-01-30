@@ -4,9 +4,11 @@ config-version: 2
 
 profile: "air_traffic_analytics"
 
+# Project-level variables
 vars:
-  lake_root: "../../../lake"
+  lake_root: "/opt/project/lake"
 
+# Paths
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -14,11 +16,13 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+# Target directories
 target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
+# Model configuration
 models:
   air_traffic_analytics:
     +materialized: view

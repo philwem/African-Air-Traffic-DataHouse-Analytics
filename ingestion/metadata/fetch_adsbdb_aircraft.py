@@ -4,10 +4,35 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
+import os
 
 
-ICAO_LIST_FILE = Path("docs/samples/unique_aircraft_icao.txt")
-CONFIG_FILE = Path("ingestion/metadata/adsbdb_config.json")
+# Resolve paths relative to this file so the script works whether run locally,
+# inside Docker, in Airflow, or in CI/CD. Allow overrides via environment vars
+# (common practice for containerized and CI environments).
+_THIS_DIR = Path(__file__).resolve().parent  # .../ingestion/metadata
+PROJECT_ROOT = _THIS_DIR.parents[1]  # two levels up: project root
+
+ICAO_LIST_FILE = Path(
+    os.environ.get(
+        "ICAO_LIST_FILE",
+        PROJECT_ROOT / "docs" / "samples" / "unique_aircraft_icao.txt",
+    )
+).expanduser().resolve()
+
+CONFIG_FILE = Path(
+    os.environ.get("CONFIG_FILE", _THIS_DIR / "adsbdb_config.json")
+).expanduser().resolve()
+
+# Fail fast with a clear error if required files are missing (helps in CI/CD and Airflow).
+if not CONFIG_FILE.exists():
+    raise FileNotFoundError(
+        f"CONFIG_FILE not found: {CONFIG_FILE} (set CONFIG_FILE env var to override)"
+    )
+if not ICAO_LIST_FILE.exists():
+    raise FileNotFoundError(
+        f"ICAO_LIST_FILE not found: {ICAO_LIST_FILE} (set ICAO_LIST_FILE env var to override)"
+    )
 
 
 def utc_now_filename() -> str:

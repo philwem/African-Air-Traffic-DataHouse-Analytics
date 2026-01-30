@@ -18,6 +18,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - ./.env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -28,6 +30,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ../../:/opt/project
+      - ../../.dbt:/home/airflow/.dbt:rw
     entrypoint: /bin/bash
     command:
       - -c
@@ -42,43 +45,86 @@ services:
           --email admin@example.com
 
   airflow-webserver:
-    image: apache/airflow:2.9.1  # ✅ This tells Docker to pull from Docker Hub
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: airflow-dbt:2.9.1
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - ./.env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__FERNET_KEY: ""
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+
+      # ✅ Email via Gmail SMTP
+      AIRFLOW__EMAIL__EMAIL_BACKEND: airflow.utils.email.send_email_smtp
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: "true"
+      AIRFLOW__SMTP__SMTP_SSL: "false"
+      AIRFLOW__SMTP__SMTP_USER: ${GMAIL_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_USER}
+
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./scripts:/opt/airflow/scripts
       - ../../:/opt/project
+      - ../../.dbt:/home/airflow/.dbt:rw
     ports:
       - "8080:8080"
     command: webserver
     restart: always
 
   airflow-scheduler:
-    image: apache/airflow:2.9.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: airflow-dbt:2.9.1
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - ./.env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__FERNET_KEY: ""
+
+      # ✅ Email via Gmail SMTP (scheduler sends task failure emails)
+      AIRFLOW__EMAIL__EMAIL_BACKEND: airflow.utils.email.send_email_smtp
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: "true"
+      AIRFLOW__SMTP__SMTP_SSL: "false"
+      AIRFLOW__SMTP__SMTP_USER: ${GMAIL_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_USER}
+
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./scripts:/opt/airflow/scripts
       - ../../:/opt/project
+      - ../../.dbt:/home/airflow/.dbt:rw
     command: scheduler
     restart: always
 
 volumes:
   postgres-db-volume:
+
+
+
+
+
+
+

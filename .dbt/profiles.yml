@@ -1,0 +1,8 @@
+air_traffic_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /opt/project/warehouse/air_traffic.duckdb
+      threads: 1
+      schema: main

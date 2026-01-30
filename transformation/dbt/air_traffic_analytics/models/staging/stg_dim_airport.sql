@@ -3,8 +3,8 @@ with src as (
     from read_parquet('{{ var("lake_root") }}/silver/dim_airport/dim_airport.parquet')
 )
 select
-    upper(airport_icao) as airport_icao,
-    airport_iata,
+    upper(cast(airport_icao as varchar)) as airport_icao,
+    cast(airport_iata as varchar) as airport_iata,
     airport_name,
     country,
     cast(latitude_deg as double) as latitude_deg,
